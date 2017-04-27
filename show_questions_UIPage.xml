@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+	<j:set var="jvar_sys_id" value="${sysparm_id}"/>
+    <g:evaluate jelly="true">
+		 var incId = jelly.jvar_sys_id;
+		 var ans = new GlideRecord('question_answer');
+		 ans.addQuery('table_sys_id',jelly.jvar_sys_id);
+		 ans.orderBy('order');
+		 ans.query();
+	</g:evaluate>
+	<g:ui_form id="questions">
+		<j:while test="${ans.next()}">
+			<g:set_if var="jvar_mandatory" test="${ans.question.mandatory==true}" true="is-required" false=""/>
+			<j:set var="jvar_mand" value="${ans.question.mandatory}"/>
+			<j:choose>
+				<j:when test="${ans.question.type==2}">
+					<div class="form-group ${jvar_mandatory}">
+						<j:if test="${jvar_mand}">
+							<span id="q-${ans.question}" title="" mandatory="true" class="required-marker label_description" oclass="mandatory" aria-label="Mandatory - must be populated before Submit" data-original-title="Mandatory - must be populated before Submit"></span>	
+						</j:if>
+						<label id="q-${ans.question}"><h5 id="${ans.question}">${ans.question.getDisplayValue()}</h5></label>
+						<textarea class="form-control" value="${ans.value}" name="q-${ans.question}" mandatory="${ans.question.mandatory}" id="${ans.question.question_text}"/>
+					</div>
+				</j:when>		
+				<j:when test="${ans.question.type==5}">
+					<div class="form-group  ${jvar_mandatory}">
+						<j:if test="${jvar_mand}">
+							<span id="q-${ans.question}" title="" mandatory="true" class="required-marker label_description" oclass="mandatory" aria-label="Mandatory - must be populated before Submit" data-original-title="Mandatory - must be populated before Submit"></span>	
+						</j:if>
+						<label id="q-${ans.question}"><h5 id="${ans.question}">${ans.question.getDisplayValue()}</h5></label>
+						<select class="form-control" name="q-${ans.question}">
+							<g:evaluate jelly="true">
+								var ch = new GlideRecord('question_choice');
+								ch.addQuery('question',ans.question);
+								ch.query();
+							</g:evaluate>
+							<j:while test="${ch.next()}">
+									<option value="${ch.text}">${ch.text}</option>
+							</j:while>
+						</select>
+					</div>
+				</j:when>
+				<j:when test="${ans.question.type==7}">
+					<div class="form-group  ${jvar_mandatory}">
+						<j:if test="${jvar_mand}">
+							<span id="q-${ans.question}" title="" mandatory="true" class="required-marker label_description" oclass="mandatory" aria-label="Mandatory - must be populated before Submit" data-original-title="Mandatory - must be populated before Submit"></span>	
+						</j:if>
+						<label id="q-${ans.question}"><h5 id="${ans.question}">${ans.question.getDisplayValue()}</h5></label>
+						<g:no_escape>${ans.question.description}</g:no_escape>
+						<input class="checkbox" type ="checkbox" name="q-${ans.question}" mandatory="${ans.question.mandatory}" id="${ans.question.question_text}"/>
+					</div>
+				</j:when>			
+				<j:when test="${ans.question.type==9 || ans.question.type==10}">
+					<div class="form-group   ${jvar_mandatory}">
+						<j:if test="${jvar_mand}">
+							<span id="q-${ans.question}" title="" mandatory="true" class="required-marker label_description" oclass="mandatory" aria-label="Mandatory - must be populated before Submit" data-original-title="Mandatory - must be populated before Submit"></span>	
+						</j:if>
+						<label id="q-${ans.question}"><h5 id="${ans.question}">${ans.question.getDisplayValue()}</h5></label>
+						<input class="form-control" type ="date" value="${ans.value}" name="q-${ans.question}" mandatory="${ans.question.mandatory}" id="${ans.question.question_text}" />
+					</div>
+				</j:when>			
+				<j:otherwise>
+					<div class="form-group  ${jvar_mandatory} center-block">
+						<j:if test="${jvar_mand}">
+							<span id="q-${ans.question}" title="" mandatory="true" class="required-marker label_description" oclass="mandatory" aria-label="Mandatory - must be populated before Submit" data-original-title="Mandatory - must be populated before Submit"></span>	
+						</j:if>
+						<label id="q-${ans.question}"><h5 id="${ans.question}">${ans.question.getDisplayValue()}</h5></label>		
+						<input class="form-control" type="text" value="${ans.value}" name="q-${ans.question}" mandatory="${ans.question.mandatory}" id="${ans.question.question_text}"/>
+					</div>
+				</j:otherwise>
+			</j:choose>	
+		</j:while>	
+		<button type="submit" class="btn btn-primary save">Guardar</button>
+    </g:ui_form>
+</j:jelly>
